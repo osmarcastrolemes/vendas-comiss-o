@@ -7,6 +7,7 @@ app.use('/auth', require('./modules/auth/auth.routes'));
 app.use('/vendas', require('./modules/vendas/vendas.routes'));
 app.use('/usuarios', require('./modules/usuarios/usuarios.routes'));
 app.use('/parametros', require('./modules/parametros/parametros.routes'));
+app.use('/categorias', require('./modules/categorias/categorias.routes'));
 
 app.get('/', (req, res) => {
   res.json({ message: '🚀 API de Vendas funcionando!' });
