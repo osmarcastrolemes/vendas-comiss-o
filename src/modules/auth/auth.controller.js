@@ -39,5 +39,3 @@ const login = async (req, res) => {
     if (!usuario) {
       return res.status(401).json({ error: 'E-mail ou senha inválidos' });
     }
-
-    const senhaValida = await
