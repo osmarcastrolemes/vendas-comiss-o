@@ -1,16 +1,43 @@
-const express = require('express');
-const app = express();
+import React, { useEffect } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { AuthProvider, useAuth } from './src/context/AuthContext';
 
-app.use(express.json());
+import LoginScreen from './src/screens/LoginScreen';
+import HomeScreen from './src/screens/HomeScreen';
+import NovaVendaScreen from './src/screens/NovaVendaScreen';
+import HistoricoScreen from './src/screens/HistoricoScreen';
 
-// Rotas
-app.use('/auth', require('./modules/auth/auth.routes'));
-app.use('/vendas', require('./modules/vendas/vendas.routes'));
-app.use('/usuarios', require('./modules/usuarios/usuarios.routes'));
-app.use('/parametros', require('./modules/parametros/parametros.routes'));
+const Stack = createNativeStackNavigator();
 
-app.get('/', (req, res) => {
-  res.json({ message: '🚀 API de Vendas funcionando!' });
-});
+function Rotas() {
+  const { token, carregarSessao } = useAuth();
 
-module.exports = app;
+  useEffect(() => {
+    carregarSessao();
+  }, []);
+
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      {!token ? (
+        <Stack.Screen name="Login" component={LoginScreen} />
+      ) : (
+        <>
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="NovaVenda" component={NovaVendaScreen} />
+          <Stack.Screen name="Historico" component={HistoricoScreen} />
+        </>
+      )}
+    </Stack.Navigator>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <NavigationContainer>
+        <Rotas />
+      </NavigationContainer>
+    </AuthProvider>
+  );
+}
