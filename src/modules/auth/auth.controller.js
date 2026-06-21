@@ -34,56 +34,10 @@ const login = async (req, res) => {
     const result = await pool.query('SELECT * FROM usuarios WHERE email = $1', [email]);
     const usuario = result.rows[0];
 
+    console.log('Usuario encontrado:', JSON.stringify(usuario));
+
     if (!usuario) {
       return res.status(401).json({ error: 'E-mail ou senha inválidos' });
     }
 
-    const senhaValida = await bcrypt.compare(senha, usuario.senha_hash);
-    if (!senhaValida) {
-      return res.status(401).json({ error: 'E-mail ou senha inválidos' });
-    }
-
-    const token = jwt.sign(
-      { id: usuario.id, nome: usuario.nome, perfil: usuario.perfil },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
-    );
-
-    res.json({
-      token,
-      usuario: {
-        id: usuario.id,
-        nome: usuario.nome,
-        email: usuario.email,
-        perfil: usuario.perfil
-      }
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-// Reset de senha
-const resetSenha = async (req, res) => {
-  const { email, nova_senha } = req.body;
-
-  try {
-    const existe = await pool.query('SELECT id FROM usuarios WHERE email = $1', [email]);
-    if (existe.rows.length === 0) {
-      return res.status(404).json({ error: 'Usuário não encontrado' });
-    }
-
-    const senha_hash = await bcrypt.hash(nova_senha, 10);
-
-    await pool.query(
-      'UPDATE usuarios SET senha_hash = $1 WHERE email = $2',
-      [senha_hash, email]
-    );
-
-    res.json({ message: 'Senha atualizada com sucesso' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-module.exports = { cadastrar, login, resetSenha };
+    const senhaValida = await
