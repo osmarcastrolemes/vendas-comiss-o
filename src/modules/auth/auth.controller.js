@@ -35,6 +35,8 @@ const login = async (req, res) => {
     const usuario = result.rows[0];
 
     console.log('Usuario encontrado:', JSON.stringify(usuario));
+    console.log('senha recebida:', senha);
+    console.log('senha_hash do banco:', usuario?.senha_hash);
 
     if (!usuario) {
       return res.status(401).json({ error: 'E-mail ou senha inválidos' });
