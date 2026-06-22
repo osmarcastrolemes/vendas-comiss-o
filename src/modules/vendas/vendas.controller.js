@@ -5,13 +5,17 @@ const criar = async (req, res) => {
   const { categoria_id, codigo, valor_total, data_venda } = req.body;
   const colaborador_id = req.usuario.id;
 
+  console.log('📅 data_venda recebida do app:', data_venda);
+
   try {
     const result = await pool.query(
       `INSERT INTO vendas (colaborador_id, categoria_id, codigo, valor_total, data_venda)
-       VALUES ($1, $2, $3, $4, $5)
+       VALUES ($1, $2, $3, $4, $5::date)
        RETURNING *`,
-      [colaborador_id, categoria_id, codigo, valor_total, data_venda || new Date()]
+      [colaborador_id, categoria_id, codigo, valor_total, data_venda || new Date().toISOString().split('T')[0]]
     );
+
+    console.log('📅 data_venda salva no banco:', result.rows[0].data_venda);
 
     res.status(201).json(result.rows[0]);
   } catch (err) {
