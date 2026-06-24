@@ -56,7 +56,9 @@ const resumo = async (req, res) => {
       `SELECT
          SUM(v.valor_total) AS total_vendido,
          ROUND(SUM(v.valor_total) * (SELECT CAST(valor AS NUMERIC) / 100 FROM parametros WHERE chave = 'percentual_comissao'), 2) AS comissao,
-         (SELECT valor FROM parametros WHERE chave = 'percentual_comissao') AS percentual_comissao
+         (SELECT valor FROM parametros WHERE chave = 'percentual_comissao') AS percentual_comissao,
+         SUM(CASE WHEN v.data_venda = CURRENT_DATE THEN v.valor_total ELSE 0 END) AS total_dia,
+         ROUND(SUM(v.valor_total) / NULLIF(COUNT(DISTINCT v.data_venda), 0), 2) AS media_diaria
        FROM vendas v
        WHERE v.colaborador_id = $1
          AND EXTRACT(MONTH FROM v.data_venda) = $2
@@ -69,7 +71,6 @@ const resumo = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
 // Listar todas as vendas (apenas admin)
 const listarTodas = async (req, res) => {
   if (req.usuario.perfil !== 'admin') {
